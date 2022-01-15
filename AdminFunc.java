@@ -1,3 +1,12 @@
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -16,8 +25,21 @@ public class AdminFunc extends javax.swing.JFrame {
      * Creates new form AdminFunc
      */
     public AdminFunc() {
+         BackImage();
         initComponents();
         Hello.setText("Hello "+ s.nameAdmin);
+    }
+     public void BackImage ()
+    {
+        BufferedImage img = null;
+try {
+    img = ImageIO.read(new File("E:\\5th Semester\\SCD Lab\\Library_Management_System\\src\\back.jpg"));
+} catch (IOException e) {
+    e.printStackTrace();
+}
+Image dimg = img.getScaledInstance(704, 361, Image.SCALE_SMOOTH);
+ImageIcon imageIcon = new ImageIcon(dimg);
+setContentPane(new JLabel(imageIcon));
     }
 
     /**

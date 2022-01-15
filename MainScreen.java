@@ -1,3 +1,18 @@
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,31 +24,51 @@
  * @author Hamid
  */
 
-import java.io.BufferedWriter;
-import java.nio.file.*;
-
-import java.io.IOException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class MainScreen extends javax.swing.JFrame {
+    
+    static Connection con;
     String path;
-  Hash hs=new Hash(20);
+  Intermediate obj =new Intermediate();
   public static String userName;
     /**
      * Creates new form Main
      */
     public MainScreen() {
+          BackImage();
         initComponents();
-        insertion();
+        initialize();
+      Connect();
      
         
         ErrorUser.setVisible(false);
         PinError.setVisible(false);
         
+    }
+      public void Connect()
+    {
+     
+      con=obj.Connect();
+      
+    }
+     public void BackImage ()
+    {
+        BufferedImage img = null;
+try {
+    img = ImageIO.read(new File("E:\\5th Semester\\SCD Lab\\Library_Management_System\\src\\back.jpg"));
+} catch (IOException e) {
+    e.printStackTrace();
+}
+Image dimg = img.getScaledInstance(704, 361, Image.SCALE_SMOOTH);
+ImageIcon imageIcon = new ImageIcon(dimg);
+setContentPane(new JLabel(imageIcon));
+    }
+       private void initialize()
+    {
+        getContentPane().setBackground(new java.awt.Color(204,204,204));
+        PinField.setEchoChar('\u25CF'); 
+        PinField.setTransferHandler(null);
+       
+      
     }
 
     /**
@@ -75,7 +110,7 @@ public class MainScreen extends javax.swing.JFrame {
 
         adminLink.setBackground(new java.awt.Color(0, 0, 0));
         adminLink.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        adminLink.setForeground(new java.awt.Color(0, 102, 255));
+        adminLink.setForeground(new java.awt.Color(0, 153, 0));
         adminLink.setText("I'm an Admin");
         adminLink.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -118,7 +153,7 @@ public class MainScreen extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(183, 183, 183)
+                .addGap(200, 200, 200)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(89, 89, 89)
@@ -143,7 +178,11 @@ public class MainScreen extends javax.swing.JFrame {
                             .addGap(4, 4, 4)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(80, 80, 80)
-                        .addComponent(Please, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(Please, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(51, 51, 51)
+                        .addComponent(Welcome, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ErrorMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -151,10 +190,6 @@ public class MainScreen extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(adminLink, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(46, 46, 46))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(234, 234, 234)
-                .addComponent(Welcome, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -203,6 +238,47 @@ public class MainScreen extends javax.swing.JFrame {
         
     }//GEN-LAST:event_adminLinkMouseClicked
 
+     public boolean NameCheck(String name) {
+         boolean found =false;
+        try {
+            Statement stat = con.createStatement();
+            ResultSet rs = stat.executeQuery("SELECT * FROM users WHERE Name like '"+name+"'");
+
+            while (rs.next()) {
+               found=true;
+            }
+
+            stat.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return found;
+    }
+      public boolean PinCheck(String name, int pin) {
+         boolean found =false;
+        try {
+            Statement stat = con.createStatement();
+              ResultSet rs = stat.executeQuery("SELECT Pin FROM users WHERE Name like '"+name+"'");
+
+            while (rs.next()) {
+                 int Pinfound = rs.getInt("Pin");
+                 
+                 if(Pinfound == pin)
+                 {
+                      found=true;
+                 }
+                 
+                 
+            }
+
+            stat.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return found;
+    }
     private void SubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubmitActionPerformed
         // TODO add your handling code here:
         
@@ -231,9 +307,9 @@ public class MainScreen extends javax.swing.JFrame {
             ErrorUser.setText("Please Enter all credentials");
              ErrorUser.setVisible(true);
         }
-        if(hs.SearchName(name))
+        if(NameCheck(name))
         {
-            if (hs.SearchPin(name,pin))
+            if (PinCheck(name,pin))
             {
                 userName=name;
                 this.setVisible(false);
@@ -301,17 +377,7 @@ public class MainScreen extends javax.swing.JFrame {
         });
     }
     
-      public void insertion ()
-    {
-        String names[]={"Hamid Faraz","Junaid Abbas","Abshaar Hassan","Kashif Ali","Saad Mubeen","Furqan Fiaz","Joun Ahmed","Shariq Bin Shahid","Hassan Rahim","Affan Ahmed","Michael Corleone","Tony Montana","Luca Brasi","Ted Kramer","Lt. Dan","Al Pacino","Dustin Hoffman","Tom Hanks","Robert De Niro","Travis Bickle"};
-        int pins[]={2345,9023,8612,9803,2175,7922,2052,1098,3521,9761,1022,3217,8252,9122,9067,1992,5321,8100,2317,1212};
-        
-        for (int i=0; i<names.length;i++)
-        {
-              hs.insert(pins[i],names[i]);
-        }
-        
-    }
+    
       
           
 
